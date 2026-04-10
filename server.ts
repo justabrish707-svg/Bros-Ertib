@@ -7,13 +7,15 @@ import Stripe from "stripe";
 import axios from "axios";
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import cors from "cors";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  app.use(cors()); // Enable CORS for all origins
+  const PORT = process.env.PORT || 3000;
 
   const stripe = process.env.STRIPE_SECRET_KEY 
     ? new Stripe(process.env.STRIPE_SECRET_KEY) 
