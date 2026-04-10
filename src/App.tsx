@@ -54,10 +54,13 @@ const REVIEWS = [
   },
 ];
 
+// Base URL for backend API — set VITE_API_URL in .env for split deployments
+const API_BASE_URL = (import.meta as any).env.VITE_API_URL || "";
+
 // Telegram Notification Helper
 const sendTelegramNotification = async (order: any) => {
   try {
-    const response = await fetch("/api/notify", {
+    const response = await fetch(`${API_BASE_URL}/api/notify`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ order }),
@@ -166,7 +169,7 @@ export default function App() {
         specialInstructions: "This is a test to verify the Telegram bot is working correctly."
       };
 
-      const response = await fetch("/api/notify", {
+      const response = await fetch(`${API_BASE_URL}/api/notify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ order: testOrder }),
@@ -228,7 +231,7 @@ export default function App() {
         const stripe = await loadStripe((import.meta as any).env.VITE_STRIPE_PUBLISHABLE_KEY);
         if (!stripe) throw new Error("Stripe failed to load");
 
-        const response = await fetch("/api/create-checkout-session", {
+        const response = await fetch(`${API_BASE_URL}/api/create-checkout-session`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ order: orderWithId }),
@@ -246,7 +249,7 @@ export default function App() {
       }
 
       if (orderData.paymentMethod === "chapa") {
-        const response = await fetch("/api/create-chapa-session", {
+        const response = await fetch(`${API_BASE_URL}/api/create-chapa-session`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ order: orderWithId }),
