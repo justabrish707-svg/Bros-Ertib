@@ -56,7 +56,12 @@ const REVIEWS = [
 
 // Base URL for backend API — set VITE_API_URL in .env for split deployments
 // During development on localhost, we use the same origin.
-const API_BASE_URL = (import.meta as any).env.VITE_API_URL || "";
+let API_BASE_URL = (import.meta as any).env.VITE_API_URL || "";
+
+// Sanitize: Remove trailing slash if user added it in Vercel settings
+if (API_BASE_URL.endsWith('/')) {
+  API_BASE_URL = API_BASE_URL.slice(0, -1);
+}
 
 if (window.location.hostname.includes('vercel.app') && !API_BASE_URL) {
   console.warn("⚠️ VITE_API_URL is missing! Backend notifications and payments will NOT work until you add your Railway/Render URL to Vercel Environment Variables.");
@@ -1150,20 +1155,27 @@ export default function App() {
         )}
       </AnimatePresence>
 
+      {/* Bot Diagnostic Error/Success Toast */}
       <AnimatePresence>
         {notificationError && (
           <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 100 }}
-            className="fixed bottom-6 left-6 right-6 z-[9999] bg-red-600/90 text-white p-4 rounded-2xl border border-white/20 shadow-2xl backdrop-blur-md flex flex-col gap-2"
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            className={`fixed bottom-6 left-6 right-6 z-[9999] p-4 rounded-2xl border shadow-2xl backdrop-blur-md flex flex-col gap-2 ${
+              notificationError.includes('Success') 
+                ? 'bg-green-600/90 border-green-400' 
+                : 'bg-red-600/90 border-red-400'
+            } text-white`}
           >
             <div className="flex justify-between items-center">
-              <span className="font-bold">⚠️ Connection Issue</span>
+              <span className="font-bold">{notificationError.includes('Success') ? '✅ Delivery Setup' : '⚠️ Connection Issue'}</span>
               <button onClick={() => setNotificationError(null)} className="text-white/60 hover:text-white">✕</button>
             </div>
             <p className="text-xs">{notificationError}</p>
-            <div className="text-[10px] opacity-60">Check VITE_API_URL settings in Vercel.</div>
+            {!notificationError.includes('Success') && (
+              <div className="text-[10px] opacity-60 font-mono">Target: {API_BASE_URL || 'Local Vercel (Wrong)'}/api/notify</div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
