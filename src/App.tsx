@@ -96,6 +96,7 @@ export default function App() {
   const [orders, setOrders] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showScroll, setShowScroll] = useState(false);
+  const [notificationError, setNotificationError] = useState<string | null>(null);
 
   // Scroll Listener
   useEffect(() => {
@@ -280,10 +281,10 @@ export default function App() {
       // Send telegram notification immediately
       try {
         await sendTelegramNotification(orderWithId);
-      } catch (tgError) {
+        setNotificationError(null);
+      } catch (tgError: any) {
         console.error("Telegram notification failed:", tgError);
-        // We don't alert the user here so we don't ruin their "Order Success" experience, 
-        // but we keep the log for debugging.
+        setNotificationError(`Bot Error: ${tgError.message || "Connection failed"}. Make sure VITE_API_URL is set in Vercel.`);
       }
 
       // Keep it open longer so they can read the confirmation
@@ -1146,6 +1147,24 @@ export default function App() {
               </div>
             </motion.div>
           </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {notificationError && (
+          <motion.div
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 100 }}
+            className="fixed bottom-6 left-6 right-6 z-[9999] bg-red-600/90 text-white p-4 rounded-2xl border border-white/20 shadow-2xl backdrop-blur-md flex flex-col gap-2"
+          >
+            <div className="flex justify-between items-center">
+              <span className="font-bold">⚠️ Connection Issue</span>
+              <button onClick={() => setNotificationError(null)} className="text-white/60 hover:text-white">✕</button>
+            </div>
+            <p className="text-xs">{notificationError}</p>
+            <div className="text-[10px] opacity-60">Check VITE_API_URL settings in Vercel.</div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
