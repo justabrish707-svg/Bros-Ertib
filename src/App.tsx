@@ -55,10 +55,19 @@ const REVIEWS = [
 ];
 
 // Base URL for backend API — set VITE_API_URL in .env for split deployments
+// During development on localhost, we use the same origin.
 const API_BASE_URL = (import.meta as any).env.VITE_API_URL || "";
+
+if (window.location.hostname.includes('vercel.app') && !API_BASE_URL) {
+  console.warn("⚠️ VITE_API_URL is missing! Backend notifications and payments will NOT work until you add your Railway/Render URL to Vercel Environment Variables.");
+}
 
 // Telegram Notification Helper
 const sendTelegramNotification = async (order: any) => {
+  if (!API_BASE_URL && window.location.hostname.includes('vercel.app')) {
+     console.error("Cannot send notification: No backend URL configured.");
+     return;
+  }
   try {
     const response = await fetch(`${API_BASE_URL}/api/notify`, {
       method: "POST",
@@ -268,9 +277,14 @@ export default function App() {
       setOrderSuccess(true);
       setIsSubmitting(false);
 
-      sendTelegramNotification(orderWithId).catch(tgError => {
+      // Send telegram notification immediately
+      try {
+        await sendTelegramNotification(orderWithId);
+      } catch (tgError) {
         console.error("Telegram notification failed:", tgError);
-      });
+        // We don't alert the user here so we don't ruin their "Order Success" experience, 
+        // but we keep the log for debugging.
+      }
 
       // Keep it open longer so they can read the confirmation
       setTimeout(() => {
