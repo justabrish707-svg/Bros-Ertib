@@ -39,14 +39,14 @@ async function startServer() {
   
   const dbAdmin = getApps().length > 0 ? getFirestore() : null;
 
-  // We need to use express.json globally except for stripe webhooks
-  app.use((req, res, next) => {
-    if (req.originalUrl === "/api/stripe-webhook") {
-      next();
-    } else {
-      express.json()(req, res, next);
+  // Use standard JSON parsing for most routes
+  app.use(express.json({
+    verify: (req: any, res, buf) => {
+      if (req.originalUrl.startsWith('/api/stripe-webhook')) {
+        req.rawBody = buf;
+      }
     }
-  });
+  }));
 
   // API route for Chapa (Telebirr/CBE) Checkout
   app.post("/api/create-chapa-session", async (req, res) => {
@@ -162,7 +162,7 @@ async function startServer() {
   });
 
   // Stripe Webhook Callback
-  app.post("/api/stripe-webhook", express.raw({type: 'application/json'}), async (req, res) => {
+  app.post("/api/stripe-webhook", async (req: any, res) => {
     const sig = req.headers['stripe-signature'];
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -172,7 +172,7 @@ async function startServer() {
 
     let event;
     try {
-      event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+      event = stripe.webhooks.constructEvent(req.rawBody, sig, webhookSecret);
     } catch (err: any) {
       console.error("Stripe webhook error:", err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
@@ -198,6 +198,36 @@ async function startServer() {
     }
 
     res.json({ received: true });
+  });
+
+  // Debug Endpoint to test Bot Connectivity directly
+  app.get("/api/debug-bot", async (req, res) => {
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    
+    console.log("--- Debug Bot Request ---");
+    console.log("Token exists:", !!token);
+    console.log("Chat ID exists:", !!chatId);
+
+    if (!token || !chatId) {
+      return res.status(500).json({ error: "Missing config in Railway environment variables." });
+    }
+
+    try {
+      const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: "🔧 *Backend Debug Success*\nYour Railway server is correctly talking to Telegram!",
+          parse_mode: "Markdown"
+        }),
+      });
+      const data = await response.json();
+      res.json({ status: "attempted", telegram_response: data });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
   });
 
   // API route for Telegram notifications
