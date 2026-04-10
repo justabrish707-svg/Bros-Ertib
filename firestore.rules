@@ -1,0 +1,66 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: orders
+    // Document ID: auto-generated
+    // Fields:
+    //   - itemId: number (required)
+    //   - itemName: string (required)
+    //   - quantity: number (required, positive)
+    //   - customerName: string (required, max 100 chars)
+    //   - phoneNumber: string (required, format)
+    //   - location: string (required, max 200 chars)
+    //   - specialInstructions: string (optional, max 500 chars)
+    //   - status: string (required, enum: pending, cooking, delivered, canceled)
+    //   - createdAt: timestamp (required)
+    //   - totalPrice: number (required, positive)
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        (request.auth.token.email == "justabrish707@gmail.com" && request.auth.token.email_verified == true) ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
+    }
+
+    function isValidOrder(data) {
+      return data.keys().hasAll(['itemId', 'itemName', 'quantity', 'customerName', 'phoneNumber', 'location', 'status', 'createdAt', 'totalPrice', 'paymentMethod', 'paymentStatus']) &&
+             data.itemId is number &&
+             data.itemName is string &&
+             data.quantity is number && data.quantity > 0 &&
+             data.customerName is string && data.customerName.size() <= 100 &&
+             data.phoneNumber is string &&
+             data.location is string && data.location.size() <= 200 &&
+             data.status in ['pending', 'cooking', 'delivered', 'canceled'] &&
+             data.createdAt is timestamp &&
+             data.totalPrice is number && data.totalPrice >= 0 &&
+             data.paymentMethod in ['delivery', 'chapa', 'stripe'] &&
+             data.paymentStatus in ['pending', 'paid', 'failed'];
+    }
+
+    match /orders/{orderId} {
+      // Anyone can create an order (unauthenticated for now to make it easy for customers)
+      // But we should probably require auth if we want to track users.
+      // For this specific request, we'll allow public creation but admin-only read/update.
+      allow create: if isValidOrder(request.resource.data);
+      
+      // Only admins can read all orders or update them
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow create, update: if isAdmin();
+    }
+  }
+}

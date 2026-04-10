@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  --color-gold: #D4AF37;
+  --color-luxury-black: #0A0A0A;
+  --color-luxury-gray: #151619;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-luxury-black text-white font-sans antialiased;
+    background-image: radial-gradient(circle at top right, rgba(212, 175, 55, 0.05), transparent 400px), 
+                      radial-gradient(circle at bottom left, rgba(212, 175, 55, 0.03), transparent 300px);
+  }
+}
+
+@layer utilities {
+  .text-shadow-gold {
+    text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+  }
+  .text-glow {
+    text-shadow: 0 0 30px rgba(212, 175, 55, 0.8), 0 0 10px rgba(212, 175, 55, 0.5);
+  }
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-2xl border border-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.5)];
+  }
+  .gold-gradient-text {
+    @apply bg-linear-to-br from-gold via-[#FFE58F] to-gold bg-clip-text text-transparent;
+  }
+}
+
+/* ── Premium Image Enhancements ── */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Vibrant food photo filter — warm, rich, appetizing */
+.food-img {
+  filter: contrast(1.08) saturate(1.2) brightness(1.04) warm(1);
+  transition: filter 0.4s ease, transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform, filter;
+}
+
+/* Hero background — subtle cinematic grade */
+.hero-img {
+  filter: contrast(1.1) saturate(1.15) brightness(0.95);
+  image-rendering: high-quality;
+}
+
+/* Menu card image zoom on hover */
+.menu-card-img {
+  filter: contrast(1.05) saturate(1.15) brightness(1.02);
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.4s ease;
+  will-change: transform;
+}
+.group:hover .menu-card-img {
+  transform: scale(1.12);
+  filter: contrast(1.1) saturate(1.25) brightness(1.06);
+}
+
+/* Story section images */
+.story-img {
+  filter: contrast(1.06) saturate(1.18) brightness(1.02);
+  transition: filter 0.4s ease, transform 0.5s ease;
+}
+.story-img:hover {
+  filter: contrast(1.12) saturate(1.3) brightness(1.05);
+  transform: scale(1.03);
+}
+
+/* Shimmer skeleton loader for images */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.img-shimmer {
+  background: linear-gradient(90deg, #151619 25%, #1f2024 50%, #151619 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0A0A0A;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.5);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 1);
+}
