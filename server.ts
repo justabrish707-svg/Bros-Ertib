@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename);
 async function startServer() {
   const app = express();
   app.use(cors()); // Enable CORS for all origins
-  const PORT = process.env.PORT || 3000;
+  const PORT = Number(process.env.PORT) || 3000;
 
   const stripe = process.env.STRIPE_SECRET_KEY 
     ? new Stripe(process.env.STRIPE_SECRET_KEY) 
