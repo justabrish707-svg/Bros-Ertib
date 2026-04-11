@@ -63,6 +63,15 @@ if (API_BASE_URL.endsWith('/')) {
   API_BASE_URL = API_BASE_URL.slice(0, -1);
 }
 
+// Sanitize: Add https:// if missing and not a relative path
+if (API_BASE_URL && !API_BASE_URL.startsWith('http')) {
+  API_BASE_URL = `https://${API_BASE_URL}`;
+}
+
+if (API_BASE_URL.includes('.internal')) {
+  console.warn("⚠️ You are using a .internal address! This will NOT work from Vercel. Please use your public .up.railway.app domain.");
+}
+
 if (window.location.hostname.includes('vercel.app') && !API_BASE_URL) {
   console.warn("⚠️ VITE_API_URL is missing! Backend notifications and payments will NOT work until you add your Railway/Render URL to Vercel Environment Variables.");
 }
