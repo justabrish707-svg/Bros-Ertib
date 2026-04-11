@@ -1171,7 +1171,7 @@ export default function App() {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className={`fixed bottom-6 left-6 right-6 z-[9999] p-4 rounded-2xl border shadow-2xl backdrop-blur-md flex flex-col gap-2 ${
+            className={`fixed bottom-6 left-6 right-6 z-9999 p-4 rounded-2xl border shadow-2xl backdrop-blur-md flex flex-col gap-2 ${
               notificationError.includes('Success') 
                 ? 'bg-green-600/90 border-green-400' 
                 : 'bg-red-600/90 border-red-400'
