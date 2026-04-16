@@ -4,6 +4,35 @@ dist/
 coverage/
 .DS_Store
 *.log
+
+# ─── Secrets & Private Keys ───────────────────────────────────
+# please ignore all private keys thx
 .env*
 !.env.example
+
+# Private keys & certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+*.jks
+*.keystore
+
+# Service account / credential files
+*service-account*.json
+*credentials*.json
+*secret*.json
+*private-key*.json
+google-credentials.json
+firebase-adminsdk*.json
+
+# SSH keys (just in case)
+id_rsa
+id_ed25519
+*.ppk
+# ──────────────────────────────────────────────────────────────
+
 .vscode/

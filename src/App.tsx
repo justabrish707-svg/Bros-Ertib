@@ -476,7 +476,7 @@ export default function App() {
                     try {
                       const result = await signInWithGoogle();
                       const email = result.user?.email ?? '';
-                      const ALLOWED_EMAILS = ['justabrish707@gmail.com'];
+                      const ALLOWED_EMAILS = (import.meta as any).env.VITE_ADMIN_EMAILS?.split(',') || ['justabrish707@gmail.com'];
                       if (!ALLOWED_EMAILS.includes(email)) {
                         await logout();
                         setAuthError(

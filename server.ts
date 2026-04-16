@@ -282,7 +282,7 @@ async function startServer() {
               [
                 {
                   text: "✅ Confirm & View Order",
-                  url: `${process.env.APP_URL || "https://ais-dev-j2btz2jnmme4xzitawqwak-134147426396.europe-west2.run.app"}`
+                  url: `${process.env.APP_URL || "http://localhost:3000"}`
                 }
               ]
             ]
