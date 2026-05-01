@@ -35,7 +35,7 @@ service cloud.firestore {
 
     function isValidOrder(data) {
       return data.keys().hasAll(['itemId', 'itemName', 'quantity', 'customerName', 'phoneNumber', 'location', 'status', 'createdAt', 'totalPrice', 'paymentMethod', 'paymentStatus']) &&
-             data.itemId is number &&
+             data.itemId is string &&
              data.itemName is string &&
              data.quantity is number && data.quantity > 0 &&
              data.customerName is string && data.customerName.size() <= 100 &&
@@ -61,6 +61,11 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
       allow create, update: if isAdmin();
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
     }
   }
 }

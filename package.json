@@ -1,7 +1,9 @@
 {
-  "name": "react-example",
+  "name": "bros-ertib-luxury-food",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Bro's እርጥብ - The ultimate premium food destination in Arba Minch.",
+  "author": "Abule Tech",
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
@@ -37,7 +39,6 @@
     "autoprefixer": "^10.4.21",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+    "typescript": "~5.8.2"
   }
 }

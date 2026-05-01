@@ -1,15 +1,24 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, updateDoc, doc, deleteDoc, Timestamp, getDocFromServer } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-// Import the Firebase configuration
-import firebaseConfig from '../firebase-applet-config.json';
+// Initialize Firebase from environment variables
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+};
 
-// Initialize Firebase SDK
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+export const db = getFirestore(app, import.meta.env.VITE_FIREBASE_DATABASE_ID);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
+export const storage = getStorage(app);
 
 // Helper for Google Sign-In
 export const signInWithGoogle = () => signInWithPopup(auth, googleProvider);
@@ -27,5 +36,5 @@ async function testConnection() {
 }
 testConnection();
 
-export { collection, addDoc, onSnapshot, query, orderBy, updateDoc, doc, deleteDoc, Timestamp, onAuthStateChanged };
+export { collection, addDoc, onSnapshot, query, orderBy, updateDoc, doc, deleteDoc, Timestamp, onAuthStateChanged, ref, uploadBytes, getDownloadURL };
 export type { User };
