@@ -28,7 +28,10 @@ export default function StorySection({ language }: Props) {
             {t.story.title1} <span className="italic text-gold font-serif">{t.story.title2}</span> {t.story.title3}
           </h3>
           <p className="text-gray-400 text-lg leading-relaxed mb-6">{t.story.p1}</p>
-          <p className="text-gray-400 text-lg leading-relaxed mb-10">{t.story.p2}</p>
+          <p className="text-gray-400 text-lg leading-relaxed mb-6">{t.story.p2}</p>
+          <p className="text-gray-400 text-lg leading-relaxed mb-6">{t.story.p3}</p>
+          <p className="text-gray-400 text-lg leading-relaxed mb-6">{t.story.p4}</p>
+          <p className="text-gray-400 text-lg leading-relaxed mb-10">{t.story.p5}</p>
           <div className="flex flex-wrap gap-3">
             {["🔥 Arba Minch's Finest", '🥚 Fresh Eggs Daily', '⚡ Fast Delivery', '💛 Since 2020'].map((feat) => (
               <span key={feat} className="text-xs font-semibold text-white/70 bg-white/5 border border-white/10 px-4 py-2 rounded-full hover:border-gold/40 hover:text-gold transition-colors cursor-default">
