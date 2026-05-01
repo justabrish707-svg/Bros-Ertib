@@ -123,13 +123,6 @@ export default function HeroSection({ language, onOrderOpen }: Props) {
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
-      <div className="scroll-indicator absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 opacity-40">
-        <span className="text-[9px] uppercase tracking-[0.3em] text-white/60">Scroll</span>
-        <div className="w-5 h-8 rounded-full border border-white/20 flex items-start justify-center pt-1.5">
-          <div className="w-1 h-2 bg-gold rounded-full" />
-        </div>
-      </div>
     </section>
   );
 }
