@@ -30,6 +30,9 @@ export const translations = {
       title3: "in Arba Minch",
       p1: "Bro's እርጥብ isn't just a restaurant; it's a culinary landmark. Born from a passion for authentic flavors and a commitment to \"Luxury\" street food, we've become the 24/7 heartbeat of Arba Minch's food scene.",
       p2: "Every plate of Ertib is a balance of heat, texture, and soul. Our secret sauces and artisanal approach ensure that every bite is an experience you'll never forget.",
+      p3: "Thanks to our 24/7 service, you can taste quality Ertib anywhere in Arba Minch city at any time - from early morning to midnight.",
+      p4: "What makes us special isn't just the taste; it's also our quality of service perfectly blended with our culture.",
+      p5: "At Bro's እርጥብ we offer more than food; we are the 24/7 heartbeat of Arba Minch.",
     },
     menu: {
       title: "What would you like to order?",
@@ -175,7 +178,7 @@ export const translations = {
     },
     story: {
       tag: "ስለ እኛ",
-      title1: "Bro's እርጥብ",
+      title1: "Bro's",
       title2: "ምን ?",
       title3: "እስከ ምን ?",
       p1: "Bro's እርጥብ ምግብ ቤት ብቻ አይደለም፤ የምግብ እውቀት ምልክት ነው። ለእውነተኛ ጣዕም ካለን ፍቅር እና አዳዲስ የምግብ አይነቶችን ለመሞከር ካለን ቁርጠኝነት የተወለደ፣ የአርባ ምንጭ የ24/7 የልብ ትርታ ነው።",
