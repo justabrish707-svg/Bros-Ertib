@@ -26,10 +26,22 @@ export const sendTelegramNotification = async (order: Partial<Order> & { id: str
   // On split deployments, API_BASE_URL points to the external backend
   const endpoint = `${API_BASE_URL}/api/notify`;
 
+  // Create a clean, perfectly serializable payload (strips complex Firestore Timestamp instances)
+  const cleanOrder = {
+    id: order.id,
+    customerName: order.customerName || '',
+    phoneNumber: order.phoneNumber || '',
+    location: order.location || '',
+    itemName: order.itemName || '',
+    quantity: order.quantity || 1,
+    totalPrice: order.totalPrice || 0,
+    specialInstructions: order.specialInstructions || '',
+  };
+
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ order }),
+    body: JSON.stringify({ order: cleanOrder }),
   });
 
   if (!response.ok) {

@@ -98,15 +98,16 @@ export default function App() {
       setSelectedItemId('');
 
       // Fire-and-forget Telegram notification
-      sendTelegramNotification(savedOrder).catch((err) =>
-        console.warn('Telegram notify failed (non-blocking):', err)
-      );
+      sendTelegramNotification(savedOrder).catch((err) => {
+        console.error('Telegram notify failed:', err);
+        alert(`Order saved in Firestore, but Telegram notify failed: ${err.message}`);
+      });
 
       // Auto-close after 4s
       setTimeout(() => closeOrderModal(), 4000);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting order:', error);
-      alert('Failed to submit order. Please check your connection and try again.');
+      alert(`Failed to submit order to database: ${error.message || error}`);
     } finally {
       setIsSubmitting(false);
     }
