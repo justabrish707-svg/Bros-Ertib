@@ -27,9 +27,8 @@ if (API_BASE_URL.includes('.internal')) {
 export { API_BASE_URL };
 
 export const sendTelegramNotification = async (order: Partial<Order> & { id: string }): Promise<void> => {
-  // On Vercel, /api/notify is a same-domain serverless function — relative URL works fine
-  // On split deployments, API_BASE_URL points to the external backend
-  const endpoint = `${API_BASE_URL}/api/notify`;
+  // Use a direct relative path. This is 100% same-origin, avoiding all browser redirect CORS preflight blocks.
+  const endpoint = `/api/notify`;
 
   // Create a clean, perfectly serializable payload (strips complex Firestore Timestamp instances)
   const cleanOrder = {
@@ -49,8 +48,14 @@ export const sendTelegramNotification = async (order: Partial<Order> & { id: str
     body: JSON.stringify({ order: cleanOrder }),
   });
 
+  const responseText = await response.text();
+
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.details || errorData.error || 'Failed to send Telegram notification.');
+    let errorMessage = `HTTP ${response.status}: ${responseText || 'Unknown error'}`;
+    try {
+      const errorData = JSON.parse(responseText);
+      errorMessage = errorData.details || errorData.error || errorMessage;
+    } catch (e) {}
+    throw new Error(errorMessage);
   }
 };
