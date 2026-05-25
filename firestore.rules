@@ -28,7 +28,7 @@ service cloud.firestore {
 
     function isAdmin() {
       return isAuthenticated() && (
-        (request.auth.token.email == "justabrish707@gmail.com" && request.auth.token.email_verified == true) ||
+        (request.auth.token.email in ["justabrish707@gmail.com", "admin@gmail.com"] && request.auth.token.email_verified == true) ||
         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
       );
     }
@@ -45,7 +45,9 @@ service cloud.firestore {
              data.createdAt is timestamp &&
              data.totalPrice is number && data.totalPrice >= 0 &&
              data.paymentMethod in ['delivery', 'chapa', 'stripe'] &&
-             data.paymentStatus in ['pending', 'paid', 'failed'];
+             data.paymentStatus in ['pending', 'paid', 'failed'] &&
+             // telegramNotificationStatus is optional — validate only when present
+             (!('telegramNotificationStatus' in data) || data.telegramNotificationStatus in ['pending', 'sent', 'failed']);
     }
 
     match /orders/{orderId} {

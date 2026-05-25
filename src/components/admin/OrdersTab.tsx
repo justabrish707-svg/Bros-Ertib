@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { motion } from 'motion/react';
-import { CheckCircle2, Timer, Trash2, Phone, Utensils, CreditCard } from 'lucide-react';
+import { CheckCircle2, Timer, Trash2, Phone, Utensils, CreditCard, Send, AlertTriangle } from 'lucide-react';
 import { Order, Language } from '../../types';
 import { translations } from '../../translations';
 import { db, updateDoc, doc, deleteDoc } from '../../firebase';
@@ -11,6 +12,24 @@ interface Props {
 
 export default function OrdersTab({ language, orders }: Props) {
   const t = translations[language];
+  const [retryingIds, setRetryingIds] = useState<Record<string, boolean>>({});
+
+  const retryTelegramNotification = async (order: Order) => {
+    setRetryingIds((prev) => ({ ...prev, [order.id]: true }));
+    try {
+      const { sendTelegramNotification } = await import('../../utils/api');
+      await sendTelegramNotification(order);
+      await updateDoc(doc(db, 'orders', order.id), {
+        telegramNotificationStatus: 'sent'
+      });
+      alert('Telegram notification sent successfully!');
+    } catch (err: any) {
+      console.error('Manual Telegram notification retry failed:', err);
+      alert(`Failed to send notification: ${err.message || err}`);
+    } finally {
+      setRetryingIds((prev) => ({ ...prev, [order.id]: false }));
+    }
+  };
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
@@ -71,7 +90,7 @@ export default function OrdersTab({ language, orders }: Props) {
                 "{order.specialInstructions}"
               </div>
             )}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 flex-wrap">
               <div className="text-xl font-bold">{order.totalPrice} ETB</div>
               <div className={`flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter ${
                 order.paymentStatus === 'paid' ? 'bg-green-500/20 text-green-500' : 'bg-gray-500/20 text-gray-400'
@@ -80,10 +99,41 @@ export default function OrdersTab({ language, orders }: Props) {
                  order.paymentMethod === 'chapa' ? <Phone size={10} /> : <Utensils size={10} />}
                 {order.paymentMethod === 'stripe' ? 'Stripe' : order.paymentMethod === 'chapa' ? 'Telebirr/CBE' : 'Delivery'} • {order.paymentStatus || 'pending'}
               </div>
+
+              {/* Telegram status */}
+              {order.telegramNotificationStatus === 'failed' && (
+                <div className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter bg-red-500/10 text-red-500 border border-red-500/20">
+                  <AlertTriangle size={10} />
+                  Telegram Failed
+                </div>
+              )}
+              {order.telegramNotificationStatus === 'pending' && (
+                <div className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 animate-pulse">
+                  <AlertTriangle size={10} />
+                  Telegram Pending
+                </div>
+              )}
+              {order.telegramNotificationStatus === 'sent' && (
+                <div className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter bg-green-500/10 text-green-400 border border-green-500/20">
+                  <Send size={10} />
+                  Telegram Sent
+                </div>
+              )}
             </div>
           </div>
 
           <div className="flex flex-row md:flex-col gap-2 justify-end">
+            {(order.telegramNotificationStatus === 'failed' || order.telegramNotificationStatus === 'pending') && (
+              <button
+                onClick={() => retryTelegramNotification(order)}
+                disabled={retryingIds[order.id]}
+                className="p-3 bg-yellow-500/10 text-yellow-500 rounded-xl hover:bg-yellow-500 hover:text-white transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
+                title="Retry Telegram notification"
+              >
+                <Send size={20} className={retryingIds[order.id] ? 'animate-bounce' : ''} />
+                <span className="md:hidden">Retry Telegram</span>
+              </button>
+            )}
             <button
               onClick={() => updateOrderStatus(order.id, 'cooking')}
               className="p-3 bg-blue-500/10 text-blue-500 rounded-xl hover:bg-blue-500 hover:text-white transition-all flex items-center gap-2"

@@ -26,6 +26,7 @@ export interface Order {
   totalPrice: number;
   paymentMethod: 'delivery' | 'chapa' | 'stripe';
   paymentStatus: 'pending' | 'paid' | 'failed';
+  telegramNotificationStatus?: 'pending' | 'sent' | 'failed';
 }
 
 export type AdminTab = 'orders' | 'products' | 'analytics';

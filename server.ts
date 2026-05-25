@@ -164,7 +164,9 @@ async function startServer() {
     }
   }
   
-  const dbAdmin = getApps().length > 0 ? getFirestore() : null;
+  const dbAdmin = getApps().length > 0 
+    ? getFirestore(process.env.VITE_FIREBASE_DATABASE_ID || "ai-studio-e5111c6d-d3a0-4a0e-b798-b16fc81ab420") 
+    : null;
 
   // Use standard JSON parsing for most routes, capturing raw body for webhooks
   app.use(express.json({
@@ -177,6 +179,19 @@ async function startServer() {
       }
     }
   }));
+
+  // Support parsing text/plain body as JSON (for compatibility with CORS-preflight-bypassing clients)
+  app.use(express.text({ type: 'text/plain' }));
+  app.use((req, res, next) => {
+    if (typeof req.body === 'string' && req.body.trim().startsWith('{')) {
+      try {
+        req.body = JSON.parse(req.body);
+      } catch (e) {
+        console.error("Failed to parse text/plain body as JSON:", e);
+      }
+    }
+    next();
+  });
 
   // API route for Chapa (Telebirr/CBE) Checkout
   app.post("/api/create-chapa-session", checkoutRateLimiter, validateOrderPayload, async (req, res) => {
@@ -302,7 +317,7 @@ async function startServer() {
         },
       });
 
-      res.json({ id: session.id });
+      res.json({ id: session.id, url: session.url });
     } catch (error: any) {
       console.error("Stripe error:", error);
       res.status(500).json({ error: "Failed to initialize Stripe payment. Please try again." });
