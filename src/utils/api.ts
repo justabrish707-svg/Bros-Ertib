@@ -5,6 +5,11 @@ import { Order } from '../types';
 // - On split deployments (e.g. Railway backend): set VITE_API_URL to your backend URL
 let API_BASE_URL = (import.meta as any).env.VITE_API_URL || '';
 
+// If empty, default to current origin (works seamlessly on localhost and Vercel)
+if (!API_BASE_URL && typeof window !== 'undefined') {
+  API_BASE_URL = window.location.origin;
+}
+
 // Sanitize: Remove trailing slash
 if (API_BASE_URL.endsWith('/')) {
   API_BASE_URL = API_BASE_URL.slice(0, -1);
