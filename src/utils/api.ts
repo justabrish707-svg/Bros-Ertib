@@ -45,7 +45,7 @@ export const sendTelegramNotification = async (order: Partial<Order> & { id: str
 
   const response = await fetch(endpoint, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify({ order: cleanOrder }),
   });
 
